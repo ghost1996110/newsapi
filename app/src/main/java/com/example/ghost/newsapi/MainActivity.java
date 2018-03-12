@@ -38,9 +38,10 @@ public class MainActivity extends AppCompatActivity {
     static final String KEY_URL = "url";
     static final String KEY_URLTOIMAGE = "urlToImage";
     static final String KEY_PUBLISHEDAT = "publishedAt";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        url="https://newsapi.org/v2/top-headlines?country=us&apiKey=6fcf9cfe37024ac4b3ccdd0187c91568";
+        url = "https://newsapi.org/v2/top-headlines?country=us&apiKey=6fcf9cfe37024ac4b3ccdd0187c91568";
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         listNews = (ListView) findViewById(R.id.listNews);
@@ -48,35 +49,35 @@ public class MainActivity extends AppCompatActivity {
         listNews.setEmptyView(loader);
         new MainActivity.Asynctask().execute(url);
     }
-    public class Asynctask extends AsyncTask<String,Void,String>
-    {
+
+    public class Asynctask extends AsyncTask<String, Void, String> {
         @Override
         protected void onPostExecute(String xml) {
             try {
-            JSONObject jsonResponse = new JSONObject(xml);
-            JSONArray jsonArray = jsonResponse.optJSONArray("articles");
+                JSONObject jsonResponse = new JSONObject(xml);
+                JSONArray jsonArray = jsonResponse.optJSONArray("articles");
 
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                HashMap<String, String> map = new HashMap<>();
-                map.put(KEY_AUTHOR, jsonObject.optString(KEY_AUTHOR));
-                map.put(KEY_TITLE, jsonObject.optString(KEY_TITLE));
-                map.put(KEY_DESCRIPTION, jsonObject.optString(KEY_DESCRIPTION));
-                map.put(KEY_URL, jsonObject.optString(KEY_URL));
-                map.put(KEY_URLTOIMAGE, jsonObject.optString(KEY_URLTOIMAGE));
-                map.put(KEY_PUBLISHEDAT, jsonObject.optString(KEY_PUBLISHEDAT));
-                dataList.add(map);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    HashMap<String, String> map = new HashMap<>();
+                    map.put(KEY_AUTHOR, jsonObject.optString(KEY_AUTHOR));
+                    map.put(KEY_TITLE, jsonObject.optString(KEY_TITLE));
+                    map.put(KEY_DESCRIPTION, jsonObject.optString(KEY_DESCRIPTION));
+                    map.put(KEY_URL, jsonObject.optString(KEY_URL));
+                    map.put(KEY_URLTOIMAGE, jsonObject.optString(KEY_URLTOIMAGE));
+                    map.put(KEY_PUBLISHEDAT, jsonObject.optString(KEY_PUBLISHEDAT));
+                    dataList.add(map);
+                }
+            } catch (JSONException e) {
+
             }
-        } catch (JSONException e) {
-            Toast.makeText(getApplicationContext(), "Unexpected error", Toast.LENGTH_SHORT).show();
-        }
 
             ListNewsAdapter adapter = new ListNewsAdapter(MainActivity.this, dataList);
             listNews.setAdapter(adapter);
 
             listNews.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View view,
-                                        int position, long id) { Toast.makeText(getApplicationContext(), "Unexpected error", Toast.LENGTH_SHORT).show();
+                                        int position, long id) {
                     Intent i = new Intent(MainActivity.this, DetailsActivity.class);
                     i.putExtra("url", dataList.get(+position).get(KEY_URL));
                     startActivity(i);
@@ -89,55 +90,49 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
 
             URL url;
-            HttpURLConnection urlconnection=null;
+            HttpURLConnection urlconnection = null;
 
             try {
-                url=new URL(urls[0]);
-            urlconnection= (HttpURLConnection) url.openConnection();
+                url = new URL(urls[0]);
+                urlconnection = (HttpURLConnection) url.openConnection();
                 urlconnection.setRequestProperty("content-type", "application/json;  charset=utf-8");
 
 
                 urlconnection.setRequestProperty("Content-Language", "en-US");
 
-                urlconnection.setUseCaches (false);
+                urlconnection.setUseCaches(false);
                 urlconnection.setDoInput(true);
                 urlconnection.setDoOutput(false);
 
-                String response =streamtostring(urlconnection.getInputStream());
+                String response = streamtostring(urlconnection.getInputStream());
 
-            return response;
-
-
+                return response;
 
 
             } catch (Exception e) {
 
-            }     finally{
+            } finally {
 
                 if (urlconnection != null) {
                     urlconnection.disconnect();
                 }
             }
-return null;
+            return null;
 
         }
     }
 
 
-
-    String streamtostring(InputStream stream)throws IOException
-    {
-        BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(stream));
+    String streamtostring(InputStream stream) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
         String data;
         StringBuffer response = new StringBuffer();
-        while((data=bufferedReader.readLine())!=null)
-        {
+        while ((data = bufferedReader.readLine()) != null) {
             response.append(data);
             response.append('\r');
 
         }
-        if(stream!=null)
-        {
+        if (stream != null) {
             stream.close();
         }
         return response.toString();
